@@ -71,6 +71,28 @@ describe('Tag', function () {
     }));
 
     var a1 = Handlebars.compile('{{{img src=icon alt="person"}}}');
+    var a2 = '<img src="group.svg" alt="open iconic person" height="10" width="20">';
+    a1({icon: 'group.svg'}).should.equal(a2);
+
+    var b1 = Handlebars.compile('{{{img height="500" src=icon alt="person"}}}');
+    var b2 = '<img src="group.svg" alt="open iconic person" height="500" width="20">';
+    b1({icon: 'group.svg'}).should.equal(b2);
+  });
+
+
+  it('should change the sort order of attributes based on the given array.', function () {
+    var tag = new Tags();
+
+    Handlebars.registerHelper('img', tag.addTag('img', ['alt', 'src'], function (text, hash) {
+      var name = path.basename(hash.src, path.extname(hash.src));
+      return {
+        height: hash.height || 10,
+        width: hash.width || 20,
+        alt: 'open iconic ' + (hash.alt || name)
+      };
+    }));
+
+    var a1 = Handlebars.compile('{{{img src=icon alt="person"}}}');
     var a2 = '<img alt="open iconic person" src="group.svg" height="10" width="20">';
     a1({icon: 'group.svg'}).should.equal(a2);
 

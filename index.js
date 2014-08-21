@@ -15,6 +15,8 @@ var tag = require('html-tag');
 var _ = require('lodash');
 var extend = _.extend;
 var elements = require('./ele.js');
+var propOrder = require('./order.js');
+var sortObj = require('sort-object');
 
 
 /**
@@ -42,15 +44,21 @@ function Tags(options) {
  * html.addTag('link', {rel: 'stylesheet'});
  * ```
  *
- * @param  {String} `element` The name of the HTML tag to create.
+ * @param  {String} `name` The name of the HTML tag to create.
+ * @param  {Array} `sortProps` Default sort order to use for generated attributes.
  * @param  {Object} `defaults` Default attributes to use.
  * @return  {Function} Helper function for the given HTML tag.
  * @api public
  */
 
-Tags.prototype.addTag = function (name, defaults) {
+Tags.prototype.addTag = function (name, sortOrder, defaults) {
   var pathFn = this.options.pathFn || null;
   var self = this;
+
+  if (_.isObject(sortOrder) && !Array.isArray(sortOrder)) {
+    defaults = sortOrder;
+    sortOrder = [];
+  }
 
   /**
    * @param  {String} `text` If the first value passed to the helper is a string it will be
@@ -102,6 +110,7 @@ Tags.prototype.addTag = function (name, defaults) {
     }
 
     hash = self.resolvePaths(this, hash, pathFn);
+    hash = self.sortHash(hash, sortOrder);
 
     var makeArray = false;
     var arr = [];
@@ -119,6 +128,7 @@ Tags.prototype.addTag = function (name, defaults) {
     if (makeArray) {
       return arr.join('\n');
     }
+
     return tag(name, hash, text);
   };
 };
@@ -151,6 +161,33 @@ Tags.prototype.resolvePaths = function (thisArg, hash, pathFn) {
     }
   }.bind(thisArg));
   return hash;
+};
+
+
+/**
+ * Sort properties in the order of the keys in the
+ * given array.
+ *
+ * @param  {Object} `hash` The hash object.
+ * @param  {Array} `props` Array with attributes in the desired order.
+ * @return {Object} Sorted hash object.
+ */
+
+Tags.prototype.sortHash = function (hash, props) {
+  // Concat all of the keys from the hash, to ensure
+  // they are included in the sorted object.
+  var order = _.union([], propOrder, _.keys(hash));
+  if (props) {
+    order = _.union([], props, order);
+  }
+
+  order = order.filter(function (attr) {
+    if (hash.hasOwnProperty(attr)) {
+      return true;
+    }
+  });
+
+  return _.omit(sortObj(hash, order));
 };
 
 
