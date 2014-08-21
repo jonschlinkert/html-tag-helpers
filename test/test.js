@@ -1,5 +1,5 @@
 /*!
- * html-helpers <https://github.com/jonschlinkert/html-helpers>
+ * html-tag-helpers <https://github.com/jonschlinkert/html-tag-helpers>
  *
  * Copyright (c) 2014 Jon Schlinkert, contributors.
  * Licensed under the MIT License
@@ -10,27 +10,18 @@
 var path = require('path');
 var should = require('should');
 var Handlebars = require('handlebars');
-var Tag = require('../');
+var Tags = require('..');
 
 describe('Tag', function () {
   it('should generate a function for the given HTML tag.', function () {
-    var html = new Tag();
+    var html = new Tags();
     var a = html.addTag('a');
 
-    a({href: 'foo', text: true}).should.equal('<a href="foo"></a>')
-  });
-});
-
-describe('Tag', function () {
-  it('should generate a function for the given HTML tag.', function () {
-    var html = new Tag();
-    var a = html.addTag('a');
-
-    a({href: 'foo'}).should.equal('<a href="foo"></a>')
+    a({href: 'foo'}).should.equal('<a href="foo"></a>');
   });
 
   it('should generate a helper', function () {
-    var tag = new Tag();
+    var tag = new Tags();
 
     Handlebars.registerHelper('a', tag.addTag('a'));
     var html = Handlebars.compile('{{{a "This is text" href=link}}}');
@@ -38,7 +29,7 @@ describe('Tag', function () {
   });
 
   it('should generate a helper for a void tag.', function () {
-    var tag = new Tag();
+    var tag = new Tags();
 
     Handlebars.registerHelper('img', tag.addTag('img'));
     var html = Handlebars.compile('{{{img src=image}}}');
@@ -46,7 +37,7 @@ describe('Tag', function () {
   });
 
   it('should use default attribute values in the generated HTML.', function () {
-    var tag = new Tag();
+    var tag = new Tags();
 
     Handlebars.registerHelper('link', tag.addTag('link', {
       rel: 'stylesheet'
@@ -57,7 +48,7 @@ describe('Tag', function () {
   });
 
   it('should override default attribute values with hash values.', function () {
-    var tag = new Tag();
+    var tag = new Tags();
 
     Handlebars.registerHelper('link', tag.addTag('link', {
       rel: 'stylesheet'
@@ -68,7 +59,7 @@ describe('Tag', function () {
   });
 
   it('should accept a function as a second arg for modifying attributes.', function () {
-    var tag = new Tag();
+    var tag = new Tags();
 
     Handlebars.registerHelper('img', tag.addTag('img', function (text, hash) {
       var name = path.basename(hash.src, path.extname(hash.src));
@@ -92,7 +83,7 @@ describe('Tag', function () {
 
 describe('when a `pathFn` is given:', function () {
   it('should use it to recalculate `href`s.', function () {
-    var tag = new Tag({
+    var tag = new Tags({
       pathFn: function  (url) {
         return 'assets/' + url;
       }
@@ -107,7 +98,7 @@ describe('when a `pathFn` is given:', function () {
   });
 
   it('should pass the current context to the path function.', function () {
-    var tag = new Tag({
+    var tag = new Tags({
       pathFn: function  (url) {
         return this.assets + '/' + url;
       }
@@ -120,5 +111,31 @@ describe('when a `pathFn` is given:', function () {
     var html = Handlebars.compile('{{{link href=styles}}}');
     var context = {styles: 'bootstrap.css', assets: '_gh_pages/assets'};
     html(context).should.equal('<link rel="stylesheet" href="_gh_pages/assets/bootstrap.css">');
+  });
+});
+
+
+describe('custom tag', function () {
+  it('should generate a function for a custom HTML void tag.', function () {
+    var html = new Tags();
+    var apple = html.addTag('apple');
+
+    apple('b', {href: 'a'}).should.equal('<apple href="a">b</apple>');
+  });
+
+  it('should add close tag when the text node is `true` (Boolean).', function () {
+    var html = new Tags();
+    var c = html.addTag('c');
+
+    c({href: 'bar', text: true}).should.equal('<c href="bar"></c>');
+    c({href: 'bar'}).should.equal('<c href="bar">');
+  });
+
+  it('should add close tag when the text node is `true` (Boolean).', function () {
+    var html = new Tags();
+    var orange = html.addTag('orange');
+
+    orange('hi', {href: 'bar'}).should.equal('<orange href="bar">hi</orange>');
+    orange({href: 'bar', text: 'hi'}).should.equal('<orange href="bar">hi</orange>');
   });
 });

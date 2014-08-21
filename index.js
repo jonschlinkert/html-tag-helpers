@@ -1,5 +1,5 @@
 /*!
- * html-helpers <https://github.com/jonschlinkert/html-helpers>
+ * html-tag-helpers <https://github.com/jonschlinkert/html-tag-helpers>
  *
  * Copyright (c) 2014 Jon Schlinkert
  * Licensed under the MIT License (MIT).
@@ -19,7 +19,7 @@ var elements = require('./ele.js');
 
 /**
  * ```js
- * var Tag = require('html-helpers');
+ * var Tag = require('html-tag-helpers');
  * ```
  *
  * @param {Object} `options`
