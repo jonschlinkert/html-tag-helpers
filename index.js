@@ -106,17 +106,15 @@ Tags.prototype.addTag = function (name, defaults) {
     var makeArray = false;
     var arr = [];
 
-    if (pathFn) {
-      _.forIn(hash, function (value, key) {
-        if (/src|href|url|rel/.test(key) && Array.isArray(value)) {
-          makeArray = true;
-          value.forEach(function (url) {
-            hash[key] = url;
-            arr.push(tag(name, hash, text));
-          });
-        }
-      });
-    }
+    _.forIn(hash, function (value, key) {
+      if (/src|href|url|rel/.test(key) && Array.isArray(value)) {
+        makeArray = true;
+        value.forEach(function (url) {
+          hash[key] = url;
+          arr.push(tag(name, hash, text));
+        });
+      }
+    });
 
     if (makeArray) {
       return arr.join('\n');

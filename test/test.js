@@ -139,3 +139,13 @@ describe('custom tag', function () {
     orange({href: 'bar', text: 'hi'}).should.equal('<orange href="bar">hi</orange>');
   });
 });
+
+
+describe('url array', function () {
+  it('should generate a tag for each url in a given `href`.', function () {
+    var html = new Tags();
+    var styles = html.addTag('link');
+
+    styles({href: ['a', 'b']}).should.equal('<link href="a">\n<link href="b">');
+  });
+});
