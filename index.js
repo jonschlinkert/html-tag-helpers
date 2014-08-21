@@ -70,6 +70,7 @@ Tags.prototype.addTag = function (name, sortOrder, defaults) {
   return function (text, context) {
     var args = [].slice.call(arguments);
     var attributes = _.last(args);
+    var resolvePath = true;
 
     if (typeof text !== 'string') {
       context = text;
@@ -92,6 +93,11 @@ Tags.prototype.addTag = function (name, sortOrder, defaults) {
       hash = extend({}, defaults, hash);
     }
 
+    if (hash.hasOwnProperty('resolvePath') && hash.resolvePath === false) {
+      resolvePath = false;
+      delete hash.resolvePath;
+    }
+
     if (!text && elements.hasOwnProperty(name)) {
       if (elements[name].hasOwnProperty('text')) {
         text = elements[name].text;
@@ -109,7 +115,9 @@ Tags.prototype.addTag = function (name, sortOrder, defaults) {
       delete hash.text;
     }
 
-    hash = self.resolvePaths(this, hash, pathFn);
+    if (resolvePath) {
+      hash = self.resolvePaths(this, hash, pathFn);
+    }
     hash = self.sortHash(hash, sortOrder);
 
     var makeArray = false;
